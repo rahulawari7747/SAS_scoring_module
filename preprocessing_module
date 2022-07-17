@@ -1,0 +1,26 @@
+proc import datafile="/home/u61678994/test/practice/Model_Coeff_Piggly Wiggly Midwest.csv"
+	dbms=csv
+	out=model_val
+	replace;
+run;
+
+proc import datafile="/home/u61678994/test/practice/Model_Data_Piggly Wiggly Midwest.csv"
+	dbms=csv
+	out=model_data
+	replace;
+run;
+
+data model_data;
+	set model_data;
+	if modellingPpg="" | missing(modellingPpg) then delete;
+	Vendor=compress(Vendor," ");
+	
+run;
+
+data model_val:
+	set model_val;
+	Vendor=compress(Vendor," ");
+run;
+
+proc print data=model_data;
+run;
