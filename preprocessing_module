@@ -1,3 +1,5 @@
+
+libname xlout xlsx "/home/u61678994/test/practice/model_data_file.xlsx";
 proc import datafile="/home/u61678994/test/practice/Model_Coeff_Piggly Wiggly Midwest.csv"
 	dbms=csv
 	out=model_val
@@ -10,16 +12,22 @@ proc import datafile="/home/u61678994/test/practice/Model_Data_Piggly Wiggly Mid
 	replace;
 run;
 
-data model_data;
+data xlout.model_data;
 	set model_data;
 	if modellingPpg="" | missing(modellingPpg) then delete;
-	Vendor=compress(Vendor," ");
-	
+	/*Vendor=compress(Vendor," ");*/
+	/*newdate = input(put(DateID,10.),yymmdd10.);
+	format newdate yymmdd10.;*/
+	PPG_Key=CATX("_",Segment,Vendor,MarketDescription,modellingPpg);
+	PPG_Market=CATX("-",MarketDescription,Vendor,modellingPpg);
 run;
+
+libname xlout clear;
 
 data model_val:
 	set model_val;
 	Vendor=compress(Vendor," ");
+	PPG_Key=CATX("_",Segment,Vendor,MarketDescription,modellingPpg);
 run;
 
 proc print data=model_data;
