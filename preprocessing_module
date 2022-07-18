@@ -12,14 +12,13 @@ proc import datafile="/home/u61678994/test/practice/Model_Data_Piggly Wiggly Mid
 run;
 
 
-
 data model_data;
+	set model_data;
 	/*length Vendor $10.;
 	format Vendor $10.;
 	informat Vendor $10.;*/
-	set model_data;
 	if modellingPpg="" | missing(modellingPpg) then delete;
-	/*Vendor=compress(Vendor," ");*/
+	Vendor=compress(Vendor," ");
 	/*newdate = input(put(DateID,10.),yymmdd10.);
 	format newdate yymmdd10.;*/
 	PPG_Key=CATX("_",Segment,Vendor,MarketDescription,modellingPpg);
@@ -28,17 +27,16 @@ run;
 
 libname xlout clear;
 
-data model_val:
+data model_val;
 	set model_val;
 	Vendor=compress(Vendor," ");
 	PPG_Key=CATX("_",Segment,Vendor,MarketDescription,modellingPpg);
 run;
 
 proc sql;
-alter table model_data;
-	modify Vendor format=$10.;
+	select * into model_val from model_val
+		where PPG_Key IN (select distinct(PPG_key) from model_data);
 quit;
-
 
 
 proc print data=model_data;
