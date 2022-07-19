@@ -82,5 +82,17 @@ data model_val2;
 	else Market="ROM";
 run;
 	
+data model_data;
+	set model_data;
+	rename L5CustomerName=Retailer
+		   L5CustomerID=RetailerID
+		   Vendor=VENDOR(C)
+		   modellingPpg=PPG_Description
+		   DateID=Date
+		   segment=PPG_Cat
+		   salesUnits=wk_sold_qty_byppg
+		   salesDollars=wk_sold_doll_byppg
+		   baseUnits=wk_sold_qty_base_byppg
+run;
 proc print data=model_val2;
 run;
