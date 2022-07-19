@@ -70,6 +70,16 @@ data model_val2;
 	if model_coefficient_name="tprPercentLag1" then model_coefficient_name="tpr_discount_byppg_lag1";
 	if model_coefficient_name="tprPercentLag2" then model_coefficient_name="tpr_discount_byppg_lag2";
 	if model_coefficient_name="Intercept" then model_coefficient_name="(Intercept)";
+	rename Segment=PPG_Cat
+		   modellingPpg=PPG_Description
+		   yearFlag=Model_flag
+		   RSquare=model_RSq
+		   mape=TrainMAPE;
+	PPG_MFG=Vendor;
+	if PPG_MFG="NPPC" then PPG_MFG="NPP";
+	else PPG_MFG="Non-NPP";
+	if MarketDescription="CTA" then Market="Retailer"; 
+	else Market="ROM";
 run;
 	
 proc print data=model_val2;
