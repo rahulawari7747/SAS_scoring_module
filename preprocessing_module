@@ -1,12 +1,12 @@
 libname xlout xlsx "/home/u61678994/test/practice/model_data_file.xlsx";
-proc import datafile="/home/u61678994/test/practice/Model_Coeff_Piggly Wiggly Midwest.csv"
-	dbms=csv
+proc import datafile="/home/u61678994/test/practice/Model_Coeff_Piggly Wiggly Midwest.xlsx"
+	dbms=xlsx
 	out=model_val
 	replace;
 run;
 
-proc import datafile="/home/u61678994/test/practice/Model_Data_Piggly Wiggly Midwest.csv"
-	dbms=csv
+proc import datafile="/home/u61678994/test/practice/Model_Data_Piggly Wiggly Midwest.xlsx"
+	dbms=xlsx
 	out=model_data
 	replace;
 run;
@@ -14,9 +14,6 @@ run;
 
 data model_data;
 	set model_data;
-	/*length Vendor $10.;
-	format Vendor $10.;
-	informat Vendor $10.;*/
 	if modellingPpg="" | missing(modellingPpg) then delete;
 	Vendor=compress(Vendor," ");
 	/*newdate = input(put(DateID,10.),yymmdd10.);
@@ -25,7 +22,7 @@ data model_data;
 	PPG_Market=CATX("-",MarketDescription,Vendor,modellingPpg);
 run;
 
-libname xlout clear;
+/*libname xlout clear;*/
 
 data model_val;
 	set model_val;
@@ -34,10 +31,10 @@ data model_val;
 run;
 
 proc sql;
-	select * into model_val from model_val
+	select * from model_val
 		where PPG_Key IN (select distinct(PPG_key) from model_data);
 quit;
 
 
-proc print data=model_data;
+proc print data=model_val;
 run;
