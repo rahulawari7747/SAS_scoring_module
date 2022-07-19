@@ -23,6 +23,9 @@ data model_data;
 run;
 
 /*libname xlout clear;*/
+data model_data_temp;
+	set model_data;
+run;
 
 data model_val;
 	set model_val;
@@ -31,10 +34,43 @@ data model_val;
 run;
 
 proc sql;
+    create table model_val2 as 
 	select * from model_val
 		where PPG_Key IN (select distinct(PPG_key) from model_data);
 quit;
 
+data model_val3;
+	set model_val2;
+	keep PPG_Key yearFlag;
+run;
 
-proc print data=model_val;
+proc sort data=model_val3 NODUP;
+by _all_;
+
+proc sql;
+    create table model_data as
+    select * from model_data_temp as x 
+    left join model_val3 as y
+    on x.PPG_Key = y.PPG_Key;
+quit;
+
+data model_val2;
+	set model_val2;
+	if model_coefficient_name="pcttpr" then model_coefficient_name="tpr_discount_byppg";
+	if model_coefficient_name="price" then model_coefficient_name="wk_sold_median_base_price_byppg_log";
+	if model_coefficient_name="segTrend" then model_coefficient_name="category_trend";
+	if model_coefficient_name="qtrFlag2" then model_coefficient_name="flag_qtr2";
+	if model_coefficient_name="qtrFlag3" then model_coefficient_name="flag_qtr3";
+	if model_coefficient_name="qtrFlag4" then model_coefficient_name="flag_qtr4";
+	if model_coefficient_name="smoothPctACV" then model_coefficient_name="ACV_Selling";
+	if model_coefficient_name="featAndDispPctAcv" then model_coefficient_name="featAndDispPctAcv";
+	if model_coefficient_name="featWoDispPctAcv" then model_coefficient_name="ACV_Feat_Only";
+	if model_coefficient_name="dispWoFeatPctAcv" then model_coefficient_name="ACV_Disp_Only";
+	if model_coefficient_name="runningMonthNum" then model_coefficient_name="monthno";
+	if model_coefficient_name="tprPercentLag1" then model_coefficient_name="tpr_discount_byppg_lag1";
+	if model_coefficient_name="tprPercentLag2" then model_coefficient_name="tpr_discount_byppg_lag2";
+	if model_coefficient_name="Intercept" then model_coefficient_name="(Intercept)";
+run;
+	
+proc print data=model_val2;
 run;
